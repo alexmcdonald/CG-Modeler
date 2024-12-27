@@ -1,0 +1,78 @@
+<Process name="Tour::TourDocumentsProcess" defaultAction="ShowTourDocumentsUI" schemaVersion="0.0.0.5">
+  <Entry>
+    <ProcessContext>
+      <Declarations>
+        <Declaration name="TourDocumentsList" type="LoTourDocuments" />
+        <Declaration name="IsInventoryDocumentItemsAvailable" type="DomBool" />
+        <Declaration name="SfReplicationCallbacks" type="BoSfReplicationCallbacks" />
+        <Declaration name="TriggerReload" type="DomBool" />
+      </Declarations>
+      <Parameters/>
+    </ProcessContext>
+    <EntryActions>
+      <Action name="CreateReplicationCallBacksBo" actionType="CREATE" type="BoSfReplicationCallbacks">
+        <Return name="ProcessContext::SfReplicationCallbacks" />
+      </Action>
+      <Action name="loadTourDocumentsList" actionType="LOAD" type="LoTourDocuments" >
+        <Parameters>
+          <Input name="tourId" value="ProcessContext::TourPKey" />
+        </Parameters>
+        <Return name="ProcessContext::TourDocumentsList" />
+      </Action>
+    </EntryActions>
+  </Entry>
+  <Body>
+    <Actions>
+      <Action actionType="VIEW" name="ShowTourDocumentsUI">
+        <UIDescription>Tour::TourDocumentsUI</UIDescription>
+        <Events>
+          <Event name="inventoryDocumentItemSelected" action="CheckIfDataIsAvailable" />
+        </Events>
+      </Action>
+      <Action name="CheckIfDataIsAvailable" actionType="LOGIC" call="ProcessContext::SfReplicationCallbacks.isDSDOrderOnDemandDataAvailable">
+        <Parameters>
+          <Input name="orderId" value="Event.inventoryDocumentId" />
+        </Parameters>
+        <Return name="ProcessContext::IsInventoryDocumentItemsAvailable" />
+        <TransitionTo action="CanLoadInventoryDocumentDecision" />
+      </Action>
+      <Action name="CanLoadInventoryDocumentDecision" actionType="DECISION" parameter="ProcessContext::IsInventoryDocumentItemsAvailable">
+        <Case value="1" action="OpenInventoryDocumentUI" />
+        <Case value="2" action="Message_LoadingInventoryDocumentItems" />
+        <CaseElse action="Message_InventoryDocumentItemsDataNotOnDevice" />
+      </Action>
+      <Action name="Message_LoadingInventoryDocumentItems" actionType="CONFIRM" confirmType="Ok">
+        <Message messageId="InventoryDocumentItemsLoadingInProgress" />
+        <Cases>
+          <Case value="Ok" action="ShowTourDocumentsUI" />
+        </Cases>
+      </Action>
+      <Action name="Message_InventoryDocumentItemsDataNotOnDevice" actionType="CONFIRM" confirmType="YesNo">
+        <Message messageId="InventoryDocumentItemsRequestOnDemandData" />
+        <Cases>
+          <Case value="Yes" action="RequestOnDemandData" />
+          <Case value="No" action="ShowTourDocumentsUI" />
+        </Cases>
+      </Action>
+      <Action name="RequestOnDemandData" actionType="LOGIC" call="ProcessContext::SfReplicationCallbacks.requestDSDOrderOnDemandDataAsync">
+        <Parameters>
+          <Input name="inventoryDocumentId" value="Event.inventoryDocumentId" />
+        </Parameters>
+        <TransitionTo action="ShowTourDocumentsUI" />
+      </Action>
+      <Action name="OpenInventoryDocumentUI" actionType="PROCESS" process="InventoryDocument::NavigationProcess">
+        <Parameters>
+          <Input name="InventoryDocumentId" value="Event.inventoryDocumentId" />
+        </Parameters>
+        <TransitionTo action="refreshTourDocuments" />
+      </Action>
+      <Action name="refreshTourDocuments" actionType="LOAD" type="LoTourDocuments" >
+        <Parameters>
+          <Input name="tourId" value="ProcessContext::TourPKey" />
+        </Parameters>
+        <Return name="ProcessContext::TourDocumentsList" />
+        <TransitionTo action="ShowTourDocumentsUI" />
+      </Action>
+    </Actions>
+  </Body>
+</Process>

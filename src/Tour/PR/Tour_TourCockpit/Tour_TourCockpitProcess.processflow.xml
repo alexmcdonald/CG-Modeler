@@ -1,0 +1,410 @@
+<Process name="Tour::TourCockpitProcess" defaultAction="ShowTourCockpitUI" schemaVersion="0.0.0.5">
+  <Entry>
+    <ProcessContext>
+      <Declarations>
+        <Declaration name="TourDataBo" type="BoTourData" />
+        <Declaration name="CurrentUser" type="DomPKey" />
+        <!-- Helper -->
+        <Declaration name="CardController" type="BoHelperTourCockpit" />
+        <!-- Card: Tour Message Start -->
+        <Declaration name="CardTourMessage_TourMessageList" type="LoTourMessage" />
+        <Declaration name="CardTourMessage_DataLoaded" type="DomBool" />
+        <!-- Card: Tour Message End -->
+        <!-- Card: Tour Visit Guidance Start -->
+        <Declaration name="CardMap_TourVisitsList" type="LoTourVisits" />
+        <Declaration name="CardMap_VisitList" type="LoVisitCockpitMap" />
+        <Declaration name="CardMap_DataLoaded" type="DomBool" />
+        <!-- Card: Tour Visit Guidance End -->
+         <!-- Card: Tour Welcome -->
+         <Declaration name="CardTourWelcome_DataLoaded" type="DomBool" />
+         <Declaration name="CardTourWelcome_TourVisitsCount" type="LuTourVisitsCount" />
+         <Declaration name="CardTourWelcome_TourDocumentsCount" type="LuTourDocumentsCount" />
+        <!-- Card: Tour Summary -->
+        <Declaration name="CardTourSummary_DataLoaded" type="DomBool" />
+        <!-- Card: Tour Visits -->
+        <Declaration name="CardTourVisits_DataLoaded" type="DomBool" />
+        <Declaration name="CardTourVisits_TourVisitsList" type="LoTourVisits" />
+        <Declaration name="CardTourVisits_ContextMenuList" type="LoTourVisitContextMenu" />
+        <Declaration name="CardTourVisits_RunningVisitCount" type="LuRunningVisitCount" />
+        <Declaration name="CardTourVisits_CanStartVisit" type="DomBool" />
+        <Declaration name="CardTourVisits_VistAction" type="DomString" />
+        
+         <!-- Card: Tour Start -->
+        <Declaration name="CardTourStart_TourStartList" type="LoTourStart" />
+        <Declaration name="CardTourStart_DataLoaded" type="DomBool" />
+        <Declaration name="CardTourStart_TourCheckoutDocList" type="LoTourDocuments" />
+        <Declaration name="CardTourStart_TourCheckoutDocuCount" type="DomInteger" />
+        <Declaration name="CardTourStart_pendingCheckoutDocuCount" type="DomInteger" />
+        <Declaration name="CardTourStart_activitiesButtonInfo" type="Object" />
+      </Declarations>
+      <Parameters>
+        <Input name="TourPKey" type="DomPKey" />
+      </Parameters>
+    </ProcessContext>
+    <EntryActions>
+      <Action name="AssignResponsible" actionType="LOGIC" call="ApplicationContext::User.getPKey">
+        <Return name="ProcessContext::CurrentUser" />
+      </Action>
+      <!-- Card: Tour Visit Guidance Start -->
+      <Action name="CardMap_CreateVisitCockpitMap" actionType="CREATE" type="LoVisitCockpitMap">
+        <Return name="ProcessContext::CardMap_VisitList" />
+      </Action>
+      <!-- Card: Tour Visit Guidance End -->
+      <Action name="LoadBo" actionType="LOAD" type="BoTourData">
+        <Parameters>
+          <Input name="pKey" value="ProcessContext::TourPKey" />
+        </Parameters>
+        <Return name="ProcessContext::TourDataBo" />
+      </Action>
+      <!-- Card Controller-->
+      <Action name="CreateCardController" actionType="CREATE" type="BoHelperTourCockpit">
+        <Return name="ProcessContext::CardController" />
+      </Action>
+      <!-- Card: Tour Welcome -->
+      <Action actionType="LOGIC" name="SetCardDate" call="Utils.createAnsiDateToday">
+        <Return name="ProcessContext::CardDate" />
+      </Action>
+      <!-- Load Tour Template Data -->
+      <Action actionType="LOAD" name="LoadTourTemplate" type="LuTourTemplateData">
+        <Parameters>
+          <Input name="pKey" value="ProcessContext::TourDataBo.tourTemplateId" />
+        </Parameters>
+        <Return name="ProcessContext::TourDataBo.luTemplate" />
+      </Action>
+      <!-- Card: Tour Start -->
+      <Action actionType="CREATE" name="CardTourStart_GetTourStartList" type="LoTourStart">
+        <Return name="ProcessContext::CardTourStart_TourStartList" />
+      </Action>
+      
+    </EntryActions>
+  </Entry>
+  <Body>
+    <Actions>
+      <Action actionType="VIEW" name="ShowTourCockpitUI">
+        <UIDescription>Tour::TourCockpitUI</UIDescription>
+        <Events>
+          <!-- Burger Menu -->
+          <Event name="showVisitsMap" action="ShowVisitsMap" />
+          <!-- Tour Message -->
+          <Event name="CardTourMessage_loadData" action="CardTourMessage_LoadMessage" />
+          <!-- Card: Tour Visit Guidance Start -->
+          <Event name="Customer_MarkerClicked" action="CardVisitGuide_ShowCustomers" />
+          <Event name="CardTourVisitsGuidance_ShowMaximizedMap" action="CardVisitGuide_ShowGuideVisitMap" />
+          <Event name="CardVisitGuide_ShowGuideVisitMap" action="CardVisitGuide_Navigate" />
+          <Event name="CardTourVisitsGuidance_loadData" action="CardTourVisitsGuide_LoadVisits" />
+          <!-- Card: Tour Visit Guidance End -->
+           <!-- Card: Tour Welcome -->
+          <Event name="CardTourWelcome_loadData" action="CardTourWelcome_loadVisitsCount" />
+          <!-- Tour Summary -->
+          <Event name="CardTourSummary_loadData" action="CardTourSummary_loadDataAction" />
+          <Event name="CardTourSummary_startTour" action="CardTourSummary_StartTour" />
+          <!-- Tour Visits -->
+          <Event name="CardTourVisits_loadData" action="CardTourVisits_LoadVisits" />
+          <Event name="CardTourVisits_itemSelected" action="CardTourVisits_VisitClicked" />
+          <Event name="CardTourVisits_contextMenuOpening" action="CardTourVisits_ContextMenuOpening" />
+          <Event name="CardTourVisits_contextMenuItemSelected" action="CardTourVisits_contextMenuItemDecision" />
+          <!-- Tour Details -->
+          <Event name="CardTourSummary_openTourDetails" action="CardTourSummary_openTourDetailsAction" />
+          <!-- Start Tour Card -->
+          <Event name="CardTourStart_loadData" action="loadTourCheckoutDocList" />
+          <Event name="CardTourStart_itemSelected" action="CardTourStart_Redirect" />
+          <Event name="CardTourStart_activitiesCompleted" action="CardTourStart_checkActivitiesStatus" />
+        </Events>
+      </Action>
+      <!-- Burger Menu Start -->
+      <Action actionType="PROCESS" name="ShowVisitsMap" process="TourVisit::TourVisitMapProcess">
+        <Parameters>
+          <Input name="TourId" value="ProcessContext::TourPKey" />
+        </Parameters>
+      </Action>
+      <!-- Burger Menu End -->
+      <!-- Load Tour Message -->
+      <Action name="CardTourMessage_LoadMessage" actionType="LOAD" type="LoTourMessage">
+        <Parameters>
+          <Input name="pKey" value="ProcessContext::TourPKey" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourMessage_TourMessageList" />
+        <TransitionTo action="CardTourMessage_AssignDisplayedSubcomponentNameForTourMessage" />
+      </Action>
+      <Action name="CardTourMessage_AssignDisplayedSubcomponentNameForTourMessage"
+        actionType="LOGIC" call="ProcessContext::CardController.getDisplayedSubcomponentName">
+        <Parameters>
+          <Input name="loItems" value="ProcessContext::CardTourMessage_TourMessageList" />
+          <Input name="type" value="TourMessage" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourMessage_DisplayedSubcomponentName" />
+        <TransitionTo action="CardTourMessage_SetDataLoaded" />
+      </Action>
+      <Action name="CardTourMessage_SetDataLoaded" actionType="LOGIC" call="Utils.identity">
+        <Parameters>
+          <Input name="value" value="1" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourMessage_DataLoaded" />
+      </Action>
+      <!-- Load Tour Message END -->
+      <!-- Card: Tour Visit Guidance Start -->
+      <Action actionType="LOGIC" name="CardVisitGuide_Navigate" call="ProcessContext::CardMap_VisitList.navigate" />
+      <Action actionType="PROCESS" name="CardVisitGuide_ShowCustomers" process="Customer::ReviewCaptureProcess">
+        <Parameters>
+          <Input name="CustomerPKey" value="Event.CustomerPKey" />
+        </Parameters>
+      </Action>
+      <Action actionType="PROCESS" name="CardVisitGuide_ShowGuideVisitMap" process="VisitGuide::ShowVisitMap">
+        <Parameters>
+          <Input name="CardVisits_VisitList" value="ProcessContext::CardMap_VisitList" />
+        </Parameters>
+      </Action>
+      <Action name="CardTourVisitsGuide_LoadVisits" actionType="LOAD" type="LoTourVisits">
+        <Parameters>
+          <Input name="tourId" value="ProcessContext::TourPKey" />
+          </Parameters>
+          <Return name="ProcessContext::CardMap_TourVisitsList" />
+          <TransitionTo action="CardMap_LoadRelevantVisit" />
+      </Action>
+      <Action actionType="LOGIC" name="CardMap_LoadRelevantVisit" call="ProcessContext::CardMap_VisitList.addRelevantItem">
+        <Parameters>
+          <Input name="loVisitList" value="ProcessContext::CardMap_TourVisitsList" />
+        </Parameters>
+        <Return name="ProcessContext::CardMap_DataLoaded" />
+      </Action>
+      <!-- Card: Tour Visit Guidance End -->
+       <!-- Card: Tour Welcome  START-->
+      <Action name="CardTourWelcome_loadVisitsCount" actionType="LOAD" type="LuTourVisitsCount">
+        <Parameters>
+          <Input name="tourPKey" value="ProcessContext::TourPKey" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourWelcome_TourVisitsCount" />
+        <TransitionTo action="CardTourWelcome_loadTourDocumentsCount"/>
+      </Action>
+      <Action name="CardTourWelcome_loadTourDocumentsCount" actionType="LOAD" type="LuTourDocumentsCount">
+        <Parameters>
+          <Input name="tourPKey" value="ProcessContext::TourPKey" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourWelcome_TourDocumentsCount" />
+        <TransitionTo action="CardTourWelcome_loadData"/>
+      </Action>
+      <Action name="CardTourWelcome_loadData" actionType="LOGIC" call="Utils.identity">
+        <Return name="ProcessContext::CardTourWelcome_DataLoaded" />
+        <Parameters>
+          <Input name="value" value="1" type="Literal" />
+        </Parameters>
+      </Action>
+      <!-- User Tour Welcome End -->
+      <!-- Load Tour Summary -->
+      <Action name="CardTourSummary_loadDataAction" actionType="LOAD" type="BoTourData">
+        <Parameters>
+          <Input name="pKey" value="ProcessContext::TourPKey" />
+        </Parameters>
+        <Return name="ProcessContext::TourDataBo" />
+        <TransitionTo action="CardTourSummary_SetDataLoaded" />
+      </Action>
+      <Action name="CardTourSummary_SetDataLoaded" actionType="LOGIC" call="Utils.identity">
+        <Parameters>
+          <Input name="value" value="1" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourSummary_DataLoaded" />
+      </Action>
+       <Action name="CardTourSummary_StartTour" actionType="LOGIC" call="ProcessContext::TourDataBo.startTour">
+         <TransitionTo action="SaveTourData" />
+      </Action>
+      <Action name="SaveTourData" actionType="SAVE">
+      </Action>
+      <!-- Load Tour Visits -->
+      <Action name="CardTourVisits_LoadVisits" actionType="LOAD" type="LoTourVisits">
+        <Parameters>
+          <Input name="tourId" value="ProcessContext::TourPKey" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourVisits_TourVisitsList" />
+        <TransitionTo action="CardTourVisits_FilterTourVisitsForCockpit"/>
+      </Action>
+      <Action name="CardTourVisits_FilterTourVisitsForCockpit" actionType="LOGIC" call="ProcessContext::CardController.filterTourVisits">
+        <Parameters>
+          <Input name="tourVisits" value="ProcessContext::CardTourVisits_TourVisitsList"/>
+        </Parameters>
+        <Return name="ProcessContext::CardTourVisits_TourVisitsList"/>
+        <TransitionTo action="CardTourVisits_DetermineInformationText" />
+      </Action> 
+      <Action name="CardTourVisits_DetermineInformationText" actionType="LOGIC" call="ProcessContext::CardController.getCockpitListCounter">
+        <Parameters>
+          <Input name="lo" value="ProcessContext::CardTourVisits_TourVisitsList" />
+          <Input name="overallCount" value="ProcessContext::CardTourWelcome_TourVisitsCount.tourVisitsCount" />
+        </Parameters>
+          <Return name="ProcessContext::CardTourVisits_InformationText" />
+          <TransitionTo action="CardTourVisits_ReduceNumberOfListItems"/>
+        </Action>
+      <Action name="CardTourVisits_ReduceNumberOfListItems" actionType="LOGIC" call="ProcessContext::CardController.reduceNumberOfListItems">
+        <Parameters>
+          <Input name="lo" value="ProcessContext::CardTourVisits_TourVisitsList" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourVisits_TourVisitsList" />
+      <TransitionTo action="CardTourVisits_AssignDisplayedSubcomponentNameForTourVisits" />
+      </Action>
+      <Action name="CardTourVisits_AssignDisplayedSubcomponentNameForTourVisits"
+        actionType="LOGIC" call="ProcessContext::CardController.getDisplayedSubcomponentName">
+        <Parameters>
+          <Input name="loItems" value="ProcessContext::CardTourVisits_TourVisitsList" />
+          <Input name="type" value="TourVisits" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourVisits_DisplayedSubcomponentName" />
+        <TransitionTo action="CardTourVisits_SetDataLoaded" />
+      </Action>
+      <Action name="CardTourVisits_SetDataLoaded" actionType="LOGIC" call="Utils.identity">
+        <Parameters>
+          <Input name="value" value="1" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourVisits_DataLoaded" />
+      </Action>
+
+      <Action actionType="LOGIC" name="CardTourVisits_ContextMenuOpening" call="Utils.identity">
+        <Return name="ProcessContext::CardTourVisits_VistAction" />
+        <Parameters>
+          <Input name="value" value="contextMenuClicked" type="Literal" />
+        </Parameters>
+        <TransitionTo action="CardTourVisits_GetRunningVisits"/>
+      </Action>
+      <Action name="CardTourVisits_GetRunningVisits" actionType="LOAD" type="LuRunningVisitCount">
+        <Return name="ProcessContext::CardTourVisits_RunningVisitCount" />
+        <TransitionTo action="CardTourVisits_CanVisitStart"/>
+      </Action>
+      <Action name="CardTourVisits_CanVisitStart" actionType="LOGIC" call="ProcessContext::CardController.canStartTourVisit">
+        <Parameters>
+          <Input name="tourId" value="ProcessContext::TourDataBo.pKey" />
+          <Input name="visitStatus" value="Event.visitStatus" />
+          <Input name="startTourActivitiesCompleted" value="ProcessContext::TourDataBo.startTourActivitiesCompleted" />
+          <Input name="runningVisitCount" value="ProcessContext::CardTourVisits_RunningVisitCount.runningVisitCount" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourVisits_CanStartVisit" />
+        <TransitionTo action="CardTourVisits_VisitActionDecision"/>
+      </Action>
+      <Action name="CardTourVisits_VisitActionDecision" actionType="DECISION" parameter="ProcessContext::CardTourVisits_VistAction">
+        <Case value="visitClicked" action="CardTourVisits_OpenVisit" />
+        <Case value="contextMenuClicked" action="CardTourVisits_GetContextMenu" />
+        <CaseElse action="ShowTourCockpitUI" />
+      </Action>
+      <Action name="CardTourVisits_GetContextMenu" actionType="LOAD" type="LoTourVisitContextMenu">
+        <Return name="ProcessContext::CardTourVisits_ContextMenuList" />
+        <Parameters>
+          <Input name="canStartVisit" value="ProcessContext::CardTourVisits_CanStartVisit" />
+        </Parameters>
+      </Action>
+
+      <Action name="CardTourVisits_contextMenuItemDecision" actionType="DECISION" parameter="Event.selected">
+        <Case value="Start" action="CardTourVisits_StartVisit" />
+        <Case value="Open" action="CardTourVisits_OpenVisit" />
+        <CaseElse action="ShowTourCockpitUI" />
+      </Action>
+      <Action name="CardTourVisits_StartVisit" actionType="PROCESS" process="Call::LoadCallProcess">
+        <Parameters>
+          <Input name="CallPKey" value="Event.pKey" />
+          <Input name="ResponsiblePKey" value="ProcessContext::CurrentUser" />
+          <Input name="ActionName" value="Start" type="Literal"/>
+          <Input name="IsCallFromDSD" value="true" type="Literal"/>
+          <Input name="CanStartVisit" value="false" type="Literal"/>
+        </Parameters>
+      </Action>
+      <Action name="CardTourVisits_OpenVisit" actionType="PROCESS" process="Call::LoadCallProcess">
+        <Parameters>
+          <Input name="CallPKey" value="Event.pKey" />
+          <Input name="ResponsiblePKey" value="ProcessContext::CurrentUser" />
+          <Input name="ActionName" value="Open" type="Literal"/>
+          <Input name="IsCallFromDSD" value="true" type="Literal"/>
+          <Input name="CanStartVisit" value="ProcessContext::CardTourVisits_CanStartVisit" />
+        </Parameters>
+      </Action>
+     
+       <Action actionType="LOGIC" name="CardTourVisits_VisitClicked" call="Utils.identity">
+          <Return name="ProcessContext::CardTourVisits_VistAction" />
+          <Parameters>
+            <Input name="value" value="visitClicked" type="Literal" />
+          </Parameters>
+          <TransitionTo action="CardTourVisits_GetRunningVisits"/>
+        </Action>
+       
+      <Action actionType="PROCESS" name="CardTourSummary_openTourDetailsAction" process="Tour::TourDetailsProcess">
+        <Parameters>
+          <Input name="TourId" value="ProcessContext::TourDataBo.pKey" />
+          <Input name="InitialTabName" value="TourDetails" type="Literal" />
+        </Parameters>
+      </Action>
+     
+      <!-- Tour Start Card Start-->
+
+      <Action name="loadTourCheckoutDocList" actionType="LOAD" type="LoTourDocuments" >
+        <Parameters>
+          <Input name="tourId" value="ProcessContext::TourPKey" />
+        </Parameters>
+        <Return name="ProcessContext::CardTourStart_TourCheckoutDocList" />
+        <TransitionTo action="CardTourStart_getCheckoutDocuCount" />
+      </Action>
+
+      <Action actionType="LOGIC" name="CardTourStart_getCheckoutDocuCount" call="ProcessContext::CardTourStart_TourCheckoutDocList.getCheckoutDocCount">
+        <Return name="ProcessContext::CardTourStart_TourCheckoutDocuCount" />
+        <TransitionTo action="CardTourStart_getPendingCheckoutDocCount" />
+      </Action>
+      <Action name="CardTourStart_getPendingCheckoutDocCount" actionType="LOGIC" call="ProcessContext::CardTourStart_TourCheckoutDocList.getPendingCheckoutDocCount">
+        <Return name="ProcessContext::CardTourStart_pendingCheckoutDocuCount" />
+        <TransitionTo action="CardTourStart_loadTourStartData"/>
+      </Action>
+      <Action actionType="LOGIC" name="CardTourStart_loadTourStartData" call="ProcessContext::CardTourStart_TourStartList.getTourStartList">
+        <Parameters>
+          <Input name="tourDataBo" value="ProcessContext::TourDataBo" />
+          <Input name="checkOutDocCount" value="ProcessContext::CardTourStart_TourCheckoutDocuCount" />
+          <Input name="checkOutPendingDocCount" value="ProcessContext::CardTourStart_pendingCheckoutDocuCount" /> 
+        </Parameters>
+        <Return name="ProcessContext::CardTourStart_TourStartList" />
+        <TransitionTo action="CardTourStart_GetActivitiesButtonInfo" />
+      </Action>
+      <Action actionType="LOGIC" name="CardTourStart_GetActivitiesButtonInfo" call="ProcessContext::CardTourStart_TourStartList.getActivitiesButtonInfo">
+        <Return name="ProcessContext::CardTourStart_activitiesButtonInfo" />
+        <Parameters>
+          <Input name="startTourActivitiesCompleted" value="ProcessContext::TourDataBo.startTourActivitiesCompleted" />
+        </Parameters>
+        <TransitionTo action="CardTourStart_setDataLoaded" />
+      </Action>
+      <Action actionType="LOGIC" name="CardTourStart_setDataLoaded" call="Utils.identity">
+        <Return name="ProcessContext::CardTourStart_DataLoaded" />
+        <Parameters>
+          <Input name="value" value="1" type="Literal" />
+        </Parameters>
+      </Action>
+      <Action actionType="DECISION" name="CardTourStart_Redirect" parameter="Event.activityId">
+        <Case value="vehicleDetails" action="CardTourStart_ShowVehicleDetails" />
+        <Case value="checkoutInventory" action="CardTourStart_ShowCheckoutDocuments" />
+        <CaseElse action="ShowTourCockpitUI" />
+      </Action>
+      <Action actionType="PROCESS" name="CardTourStart_ShowVehicleDetails" process="Tour::TourDetailsProcess">
+        <Parameters>
+          <Input name="TourId" value="ProcessContext::TourDataBo.pKey" />
+          <Input name="InitialTabName" value="ReviewVehicleDetails" type="Literal" />
+        </Parameters>
+      </Action>
+      <Action actionType="PROCESS" name="CardTourStart_ShowCheckoutDocuments" process="Tour::TourDocumentsProcess">
+        <Parameters>
+          <Input name="tourPKey" value="ProcessContext::TourPKey" />
+        </Parameters>
+      </Action>
+      <Action actionType="LOGIC" name="CardTourStart_checkActivitiesStatus" call="ProcessContext::CardTourStart_TourStartList.checkStartActivitiesStatus">
+        <Return name="ProcessContext::CardTourStart_ActivitiesStatus" />
+        <TransitionTo action="CardTourStart_ActivitiesStatusDecision" />
+      </Action>
+      <Action name="CardTourStart_ActivitiesStatusDecision" actionType="DECISION" parameter="ProcessContext::CardTourStart_ActivitiesStatus">
+        <Case value="Completed" action="CardTourStart_setStartTourActivitiesCompleted"/>
+      </Action>
+      <Action actionType="LOGIC" name="CardTourStart_setStartTourActivitiesCompleted" call="Utils.identity">
+        <Return name="ProcessContext::TourDataBo.startTourActivitiesCompleted" />
+        <Parameters>
+          <Input name="value" value="1" type="Literal" />
+        </Parameters>
+        <TransitionTo action="CardTourStart_setActivitiesButtonInfo" />
+      </Action>
+      <Action actionType="LOGIC" name="CardTourStart_setActivitiesButtonInfo" call="ProcessContext::CardTourStart_TourStartList.getActivitiesButtonInfo">
+        <Return name="ProcessContext::CardTourStart_activitiesButtonInfo" />
+        <Parameters>
+          <Input name="startTourActivitiesCompleted" value="ProcessContext::TourDataBo.startTourActivitiesCompleted" />
+        </Parameters>
+        <TransitionTo action="SaveTourData" />
+      </Action>
+      <!-- Tour Start Card End-->
+    </Actions>
+  </Body>
+</Process>

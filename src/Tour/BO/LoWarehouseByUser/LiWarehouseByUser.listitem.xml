@@ -1,0 +1,6 @@
+<ListItem name="LiWarehouseByUser">
+  <SimpleProperties>
+    <SimpleProperty id="true" name="warehousePKey" type="DomPKey" dataSourceProperty="warehousePKey" />
+    <SimpleProperty name="warehouseName" type="DomBpaName" dataSourceProperty="warehouseName" />
+  </SimpleProperties>
+</ListItem>

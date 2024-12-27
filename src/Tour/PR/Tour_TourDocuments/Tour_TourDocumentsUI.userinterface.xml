@@ -1,0 +1,59 @@
+<UIDescription name="Tour::TourDocumentsUI" schemaVersion="0.0.0.5">
+  <Page pagePattern="SingleSectionPage" cachable="false">
+    <PageHeader>
+      <Bindings>
+        <Resource target="title" type="Label" id="TourDocumentsId" defaultLabel="Inventory Overview" />
+      </Bindings>
+    </PageHeader>
+    <HeaderLine name="Header">
+    </HeaderLine>
+    <Section sectionName="masterSection" sectionPattern="SingleAreaSection">
+      <Area areaName="mainArea" areaPattern="SingleElementArea">
+        <GroupedList name="tourDocumentsList" dataSource="ProcessContext::TourDocumentsList.items[]" searchBarPlacement="HeaderLine" searchable="true">
+          <Items name="Items" itemPattern="DSDTourDocumentsItem">
+            <ItemListLayout>
+              <Default>
+                <Col flex="1">
+                  <Row layoutType="itemIdentifierCockpit" bindingId="DocumentType" />
+                  <Row>
+                    <Col width="6.5em" layoutType="itemSecondaryCockpit" bindingId="DocumentIdLabel" />
+                    <Col width="6.5em" align="right" layoutType="itemSecondaryCockpit" bindingId="Name" />
+                  </Row>
+                </Col>
+                <Col>
+                  <Row>
+                    <Col width="1.5em" height="1.5em" layoutType="Image" bindingId="PhaseIcon" />
+                    <Col layoutType="itemSecondaryCockpit" bindingId="Phase" />
+                  </Row>
+                  <Row>
+                    <Col width="9.5em" layoutType="itemSecondaryCockpit" bindingId="OrderDateLabel" />
+                    <Col width="6.5em" align="right" layoutType="itemSecondaryCockpit" bindingId="OrderDate" />
+                  </Row>
+                </Col>
+              </Default>
+            </ItemListLayout>
+            <Bindings>
+              <Resource target="OrderDateLabel" type="Label" id="orderDateLabel" defaultLabel="Creation Date" />
+              <Resource target="DocumentIdLabel" type="Label" id="documentIdLabel" defaultLabel="Document ID" />
+              <Binding target="Name" type="Text" binding=".name" bindingMode="ONE_WAY" />
+              <Binding target="OrderDate" type="Date" binding=".orderDate" bindingMode="ONE_WAY" />
+              <Binding target="Phase" type="Text" binding=".phase.text" bindingMode="ONE_WAY" />
+              <Binding target="DocumentType" type="Text" binding=".documentType.text" bindingMode="ONE_WAY" />
+              <Binding target="PhaseIcon" type="Image" binding=".phaseIcon" bindingMode="ONE_WAY" />
+            </Bindings>
+          </Items>
+          <Events>
+            <ItemSelectedEvent event="inventoryDocumentItemSelected">
+              <Params>
+                <Param name="inventoryDocumentId" value=".pKey" />
+              </Params>
+            </ItemSelectedEvent>
+          </Events>
+          <SearchAttributes>
+            <SearchAttribute name="Name" />
+          </SearchAttributes>
+        </GroupedList>
+      </Area>
+    </Section>
+  </Page>
+</UIDescription>

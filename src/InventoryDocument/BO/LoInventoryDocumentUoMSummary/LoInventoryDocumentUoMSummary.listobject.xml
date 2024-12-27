@@ -1,0 +1,13 @@
+<ListObject name="LoInventoryDocumentUoMSummary" generateLoadMethod="true" schemaVersion="1.1">
+  <DataSource name=""/>
+  <Item objectClass="LiInventoryDocumentUoMSummary"/>
+  <Methods>
+    <Method name="beforeSaveAsync"/>
+    <Method name="afterSaveAsync"/>
+    <Method name="afterLoadAsync"/>
+    <Method name="beforeLoadAsync"/>
+    <Method name="afterDoValidateAsync"/>
+    <Method name="beforeDoValidateAsync"/>
+    <Method name="calculateUoMSummary"/>
+  </Methods>
+</ListObject>
