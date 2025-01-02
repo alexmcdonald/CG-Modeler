@@ -428,6 +428,19 @@
       <Label id="NotificationPopupForUnsavedChangesTitle" text="You have unsaved changes" translationStatus="7"/>
       <Label id="NotificationPopupForUnsavedChangesBody" text="Open CG Cloud, and then navigate back to the cockpit to save changes." translationStatus="7"/>
       <Label id="AdvSearch_ApplyFilter" text="Apply Filter" translationStatus="7"/>
+      <Label id="BTNotEnabled" text="Bluetooth is turned off. Turn on bluetooth on this device and try again." translationStatus="1"/>
+      <Label id="BTScanNoDevicesFound" text="No bluetooth device detected. Make sure that the thermal printer you’re trying to connect to is turned on and within the connection range." translationStatus="1"/>
+      <Label id="BTScanFailed" text="Bluetooth scanning failed. Try scanning for bluetooth devices again." translationStatus="1"/>
+      <Label id="BTConnectionFailed" text="Couldn’t connect to the thermal printer. Make sure the thermal printer you want to connect to is turned on and within the connection range, and try again." translationStatus="1"/>
+      <Label id="BTPrintingSuccess" text="Success. Printing is complete." translationStatus="1"/>
+      <Label id="BTPrintingFailed" text="Couldn’t process the print request. Make sure that this device is connected to the thermal printer and is within the connection range, and try again." translationStatus="1"/>
+      <Label id="BTPrintingInProgress" text="Printing is in progress. Initiate a new print request after the current printing job is complete." translationStatus="1"/>
+      <Label id="BTConnectionTimeout" text="Connection timeout. Make sure that you’re connecting to the correct thermal printer, and the thermal printer is within the connection range and turned on." translationStatus="1"/>
+      <Label id="BTCanvasNotDefinedError" text="Previewing PDF print. Initiate a print request after the PDF print preview is complete." translationStatus="1"/>
+      <Label id="BTDeviceNotSupportedError" text="Can’t print from simulator app. You can’t connect to a thermal printer from a simulator app. Try connecting from the app on a supported mobile device." translationStatus="1"/>
+      <Label id="BTGenericError" text="Aww, snap! Something went wrong. Try again." translationStatus="1"/>
+      <Label id="BTInvalidWidthError" text="Couldn’t process the print request. The print layout configuration is invalid. Contact your admin." translationStatus="1"/>
+      <Label id="BTPeripheralTitle" text="Select a thermal printer" translationStatus="1"/>
     </Framework>
     <Global>
       <!-- ####################################################################################################################################################################################### -->
@@ -3056,6 +3069,10 @@
         <Label id="CardQuickAccess_NoDataMessageMainText" text="No quick links were defined for you yet" translationStatus="7"/>
         <Label id="CardTourMessage" text="Tour Message" translationStatus="7"/>
         <Label id="CardTourMessage_NoDataMessageSubText" text="No message available for this tour!" translationStatus="7"/>
+        <Label id="MyNoCardNoDataMainText" text="No data available, " translationStatus="1"/>
+        <Label id="MyNoCardNoDataSubText" text="relax and enjoy the sun!" translationStatus="1"/>
+        <Label id="DisplayCardTitle" text="Displays" translationStatus="1"/>
+        <Label id="DisplayCardInfo" text="Info / Counter" translationStatus="1"/>
       </UserInterface>
       <UserInterface id="UserNotificationFlyoutUI">
         <Label id="NotificationsTitleId" text="Notification Details" translationStatus="7"/>

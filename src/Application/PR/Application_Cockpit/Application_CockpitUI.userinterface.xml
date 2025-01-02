@@ -423,6 +423,41 @@
             </Bindings>
           </UserWelcome>
         </CardContainer>
+
+        <!-- Sample Display Card START-->
+        <CardContainer name="DisplayCard">
+          <Bindings>
+            <!-- Title and counter -->
+            <Resource target="Title" type="Label" id="DisplayCardTitle" defaultLabel="Displays" />
+            <Resource target="Information" type="Label" id="DisplayCardInfo" defaultLabel="Info / Counter" />
+            <!-- Data loaded flag -->
+            <Binding target="IsReadyToLoad" type="Text" binding="ProcessContext::CardDisplay_DataLoaded" bindingMode="ONE_WAY" />
+            <!-- Subcomponent (eg. used for no data message) -->
+            <Binding target="DisplayedSubcomponentName" type="Text" binding="ProcessContext::CardDisplay_SubComponentName" bindingMode="ONE_WAY" />
+            <!-- Defines card is collapsible -->
+            <Binding type="Text" target="IsCollapsible" call="ProcessContext::CardController.isCardCollapsible" bindingMode="ONE_WAY">
+              <Parameters>
+                <Input name="cardName" type="Literal" value="CardDisplay" />
+              </Parameters>
+            </Binding>
+            <Binding type="Text" target="CollapseState" binding="ProcessContext::CardController.collapseState_CardDisplay" bindingMode="TWO_WAY" />
+          </Bindings>
+          <VisibilityRoles allRoles="true" />
+          <Events>
+            <LoadContainerData event="CardDisplay_loadData" />
+          </Events>
+          <!-- No Data Message Subcomponent -->
+          <NoDataMessage name="CardNoDataMessageUiPlugin">
+            <Bindings>
+              <Resource target="maintext" type="Label" id="MyNoCardNoDataMainText" defaultLabel="No data available, " />
+              <Resource target="subtext" type="Label" id="MyNoCardNoDataSubText" defaultLabel="relax and enjoy the sun!" />
+              <Resource target="infoIcon" type="Image" id="Done" />
+            </Bindings>
+          </NoDataMessage>
+        </CardContainer>
+        <!-- Sample Display Card END -->
+
+
         <!-- CardVisits START -->
         <CardContainer name="CardVisits">
           <Bindings>

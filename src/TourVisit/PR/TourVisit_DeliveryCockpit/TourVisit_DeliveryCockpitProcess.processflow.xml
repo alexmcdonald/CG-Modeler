@@ -95,7 +95,7 @@
         </ReturnValues>
         <TransitionTo action="ReloadCustomer" />
       </Action>
-      <Action name="ReloadCustomer" actionType="Logic" call="ProcessContext::VisitBO.updateCustomerInfo">
+      <Action name="ReloadCustomer" actionType="LOGIC" call="ProcessContext::VisitBO.updateCustomerInfo">
         <Parameters>
           <Input name="customerObjectStatus" value="ProcessContext::CustomerObjectStatus" />
           <Input name="saveFlag" value="ProcessContext::SaveFlag" />
@@ -114,7 +114,7 @@
           <Input name="Mail" value="ProcessContext::CustomerDetail.email1" />
         </Parameters>
       </Action>
-      <Action actionType="Logic" name="StartPhoneCall" call="ProcessContext::CustomerDetail.processPhoneCall">
+      <Action actionType="LOGIC" name="StartPhoneCall" call="ProcessContext::CustomerDetail.processPhoneCall">
         <Parameters>
           <Input name="phoneNumber" value="Event.phoneNumber" />
         </Parameters>

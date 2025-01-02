@@ -5,6 +5,7 @@
     <SimpleProperty name="cardVisists_dataLoaded" type="DomBool" />
     <SimpleProperty name="cardUserWelcome_DateText" type="DomText" />
     <SimpleProperty name="isTourUser" type="DomBool" />
+    <SimpleProperty name="collapseState_CardDisplay" type="DomBol" />
     <SimpleProperty name="collapseState_CardUserWelcome" type="DomBool" />
     <SimpleProperty name="collapseState_CardSync" type="DomBool" />
     <SimpleProperty name="collapseState_CardVisits" type="DomBool" />

@@ -19,6 +19,9 @@
   <Entry>
     <ProcessContext>
       <Declarations>
+        <!-- Card: Display -->
+        <Declaration name="CardDisplay_DataLoaded" type="DomBool" />
+        <Declaration name="CardDisplay_SubComponentName" type="String" />
         <!-- Card: Visits of today -->
         <Declaration name="CardVisits_InformationText" type="String" />
         <Declaration name="CardVisits_VisitList" type="LoAgendaOverview" />
@@ -215,6 +218,8 @@
       <Action name="ShowCockpit" actionType="VIEW">
         <UIDescription>Application::CockpitUI</UIDescription>
         <Events>
+          <!-- Card: Display -->
+          <Event name="CardDisplay_loadData" action="CardDisplay_loadData" />
           <!-- Card: Visits of today -->
           <Event name="CardVisits_loadData" action="CardVisits_SetDataReady" />
           <Event name="CardVisits_showCallCalendar" action="CardVisits_ShowCallCalendar" />
@@ -388,6 +393,23 @@
         <TransitionTo action="ShowCockpit" />
       </Action>
       <!-- Cards: Reload Cockpit END-->
+
+      <!-- Cards: Display START -->
+      <Action actionType="LOGIC" name="CardDisplay_loadData" call="Utils.identity">
+        <Parameters>
+          <Input name="value" value="1" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::CardDisplay_DataLoaded" />
+        <TransitionTo action="CardDisplay_setSubComponentName" />
+      </Action>
+      <Action actionType="LOGIC" name="CardDisplay_setSubComponentName" call="Utils.identity">
+        <Parameters>
+          <Input name="value" value="CardNoDataMessageUiPlugin" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::CardDisplay_SubComponentName" />
+      </Action>
+      <!-- Card: Display END-->
+
       <!-- Card: Visits of today  START-->
       <Action actionType="LOGIC" name="CardVisits_SetDataReady" call="Utils.identity">
         <Parameters>
